@@ -18,10 +18,12 @@ class HealthCommand extends Command
 
     public function handle(): void
     {
-        foreach (config('health.checks', []) as $checkClass) {
+        foreach (config('snawbar-health.checks', []) as $checkClass) {
             $instance = new $checkClass;
             $this->processResult($instance->name(), $instance->check());
         }
+
+        $this->newLine(1);
 
         $this->printSummary();
     }
@@ -29,27 +31,27 @@ class HealthCommand extends Command
     private function processResult(string $name, array $result): void
     {
         match ($result['status']) {
-            'success' => $this->markPassed($name, $result['time']),
-            'warning' => $this->markFailed($name, $result['time']),
+            'success' => $this->markPassed($name, $result['execution_time']),
+            'warning' => $this->markFailed($name, $result['execution_time']),
             default => $this->markError($name),
         };
     }
 
     private function markPassed(string $name, float $time): void
     {
-        $this->components->info(sprintf('✓ %s PASSED in %.2f ms', $name, $time));
+        $this->components->info(sprintf('%s PASSED in %.2f ms', $name, $time));
         $this->passedCount++;
     }
 
     private function markFailed(string $name, float $time): void
     {
-        $this->components->warn(sprintf('⚠ %s FAILED in %.2f ms', $name, $time));
+        $this->components->warn(sprintf('%s FAILED in %.2f ms', $name, $time));
         $this->failedCount++;
     }
 
     private function markError(string $name): void
     {
-        $this->components->error(sprintf('✗ %s ERROR', $name));
+        $this->components->error(sprintf('%s ERROR', $name));
         $this->errorCount++;
     }
 
