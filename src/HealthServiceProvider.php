@@ -3,6 +3,7 @@
 namespace Snawbar\Health;
 
 use Illuminate\Support\ServiceProvider;
+use Snawbar\Health\Commands\HealthCommand;
 
 class HealthServiceProvider extends ServiceProvider
 {
@@ -12,9 +13,15 @@ class HealthServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'health');
 
-        $this->publishes([
-            __DIR__ . '/../config/health.php' => config_path('snawbar-health.php'),
-        ], 'health-config');
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/health.php' => config_path('snawbar-health.php'),
+            ], 'health-config');
+
+            $this->commands([
+                HealthCommand::class,
+            ]);
+        }
     }
 
     public function register()
