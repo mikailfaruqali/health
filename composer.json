@@ -1,6 +1,6 @@
 {
     "name": "mikailfaruqali/health",
-    "description": "A Laravel package for dynamic health checks and troubleshooting with a beautiful UI. Run custom database queries and diagnostics through an elegant dashboard interface.",
+    "description": "A beautiful, responsive Laravel package for creating dynamic health checks and system diagnostics with a stunning UI. Run custom database queries, monitor system health, and troubleshoot issues through an elegant dashboard interface.",
     "keywords": [
         "laravel",
         "health-check",
