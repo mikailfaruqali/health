@@ -41,7 +41,7 @@ class HealthCommand extends Command
 
         $this->processResult($instance->name(), $result);
 
-        return $result['status'] === 'error' && $instance->haltOnError();
+        return in_array($result['status'], ['warning', 'error']) && $instance->haltOnError();
     }
 
     private function processResult(string $name, array $result): void
