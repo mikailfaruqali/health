@@ -20,6 +20,11 @@ abstract class AbstractCheck implements HealthCheck
 
     abstract protected function run();
 
+    public function haltOnError(): bool
+    {
+        return FALSE;
+    }
+
     public function check(): array
     {
         $start = microtime(TRUE);
@@ -83,8 +88,9 @@ abstract class AbstractCheck implements HealthCheck
 
     protected function getMessage(): string
     {
-        return $this->isDataEmpty()
-            ? 'All checks passed successfully'
-            : sprintf('Found %d issue(s)', $this->getDataCount());
+        return match (TRUE) {
+            $this->isDataEmpty() => 'All checks passed successfully',
+            default => sprintf('Found %d issue(s)', $this->getDataCount()),
+        };
     }
 }

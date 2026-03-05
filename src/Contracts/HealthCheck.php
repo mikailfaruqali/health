@@ -7,4 +7,6 @@ interface HealthCheck
     public function name(): string;
 
     public function check(): array;
+
+    public function haltOnError(): bool;
 }

@@ -16,16 +16,32 @@ class HealthCommand extends Command
 
     private int $errorCount = 0;
 
-    public function handle(): void
+    public function handle(): int
     {
         foreach (config('snawbar-health.checks', []) as $checkClass) {
-            $instance = new $checkClass;
-            $this->processResult($instance->name(), $instance->check());
+            if ($this->runCheck($checkClass)) {
+                $this->newLine(1);
+                $this->printSummary();
+
+                return Command::FAILURE;
+            }
         }
 
         $this->newLine(1);
 
         $this->printSummary();
+
+        return Command::SUCCESS;
+    }
+
+    private function runCheck(string $checkClass): bool
+    {
+        $instance = new $checkClass;
+        $result = $instance->check();
+
+        $this->processResult($instance->name(), $result);
+
+        return $result['status'] === 'error' && $instance->haltOnError();
     }
 
     private function processResult(string $name, array $result): void
