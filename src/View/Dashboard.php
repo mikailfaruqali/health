@@ -4,14 +4,10 @@ namespace Snawbar\Health\View;
 
 class Dashboard
 {
-    private const ICONS = ['database', 'shield-halved', 'chart-line', 'server', 'gear', 'scale-balanced', 'boxes-stacked', 'file-invoice'];
-
-    private const TONES = ['primary', 'success', 'orange', 'purple', 'slate'];
-
     private const STATUS_ICONS = [
-        'success' => 'circle-check',
-        'warning' => 'triangle-exclamation',
-        'error' => 'circle-xmark',
+        'success' => 'check',
+        'warning' => 'alert',
+        'error' => 'x',
     ];
 
     private array $checks;
@@ -34,11 +30,6 @@ class Dashboard
         return filled($this->checks);
     }
 
-    public function title(): string
-    {
-        return $this->hasResults() ? 'Results' : 'Checks';
-    }
-
     public function backUrl(): string
     {
         return url()->current();
@@ -54,39 +45,71 @@ class Dashboard
         return date('Y');
     }
 
+    public function listTitle(): string
+    {
+        return $this->hasResults() ? 'Results' : 'Checks';
+    }
+
+    public function listCount(): int
+    {
+        return $this->hasResults() ? count($this->results) : count($this->checks);
+    }
+
+    public function summary(): array
+    {
+        $passed = $this->countByStatus('success');
+        $issues = $this->countByStatus('warning');
+        $errors = $this->countByStatus('error');
+
+        return match (TRUE) {
+            ! $this->hasResults() => [
+                'tone' => 'idle',
+                'icon' => 'pulse',
+                'title' => $this->hasChecks() ? $this->plural(count($this->checks), 'check') . ' configured' : 'No checks configured',
+                'text' => $this->hasChecks() ? 'Run every check at once, or pick a single one below.' : 'Register check classes in config/snawbar-health.php.',
+            ],
+            $errors > 0 => [
+                'tone' => 'error',
+                'icon' => 'x',
+                'title' => $this->plural($errors, 'check') . ' failed to run',
+                'text' => $this->breakdown($passed),
+            ],
+            $issues > 0 => [
+                'tone' => 'warning',
+                'icon' => 'alert',
+                'title' => $this->plural($issues, 'check') . ' need attention',
+                'text' => $this->breakdown($passed),
+            ],
+            default => [
+                'tone' => 'success',
+                'icon' => 'check',
+                'title' => 'All checks passed',
+                'text' => sprintf('%s completed with no issues found.', $this->plural($passed, 'check')),
+            ],
+        };
+    }
+
     public function stats(): array
     {
-        $total = [
-            'label' => 'Total',
-            'value' => $this->hasResults() ? count($this->results) : count($this->checks),
-            'tone' => 'total',
-        ];
-
         if (! $this->hasResults()) {
-            return [$total];
+            return [];
         }
 
-        $stats = [
-            $total,
+        return [
             ['label' => 'Passed', 'value' => $this->countByStatus('success'), 'tone' => 'success'],
             ['label' => 'Issues', 'value' => $this->countByStatus('warning'), 'tone' => 'warning'],
             ['label' => 'Errors', 'value' => $this->countByStatus('error'), 'tone' => 'error'],
         ];
-
-        return array_values(array_filter($stats, fn ($stat) => $stat['tone'] !== 'error' || $stat['value'] > 0));
     }
 
     public function checks(): array
     {
         return collect($this->checks)
-            ->values()
-            ->map(fn ($check, $index) => [
+            ->map(fn ($check) => [
                 'name' => $check['name'],
                 'url' => $this->runUrl($check['class']),
-                'icon' => self::ICONS[$index % count(self::ICONS)],
-                'tone' => self::TONES[$index % count(self::TONES)],
-                'delay' => $this->animationDelay($index),
             ])
+            ->values()
             ->all();
     }
 
@@ -95,7 +118,6 @@ class Dashboard
         return collect($this->results)
             ->map(fn ($result, $class) => $this->presentResult($class, $result))
             ->values()
-            ->map(fn ($result, $index) => $result + ['delay' => $this->animationDelay($index)])
             ->all();
     }
 
@@ -104,6 +126,7 @@ class Dashboard
         $status = $result['status'];
         $data = $this->normalizeData($result['data']);
         $headers = $this->headers($data);
+        $view = $this->bodyView($status, $data, $headers);
 
         return [
             'name' => $result['name'],
@@ -113,7 +136,8 @@ class Dashboard
             'time' => $result['execution_time'] . ' ms',
             'rerunUrl' => $this->runUrl($class),
             'message' => $result['message'],
-            'view' => $this->bodyView($status, $data, $headers),
+            'view' => $view,
+            'expandable' => $view !== 'passed',
             'headers' => array_map(fn ($header) => str_replace('_', ' ', $header), $headers),
             'rows' => $this->rows($data),
         ];
@@ -133,9 +157,19 @@ class Dashboard
     {
         return match ($status) {
             'success' => 'Passed',
-            'warning' => sprintf('%d %s', $count, $count === 1 ? 'issue' : 'issues'),
+            'warning' => $this->plural($count, 'issue'),
             default => 'Error',
         };
+    }
+
+    private function breakdown(int $passed): string
+    {
+        return sprintf('%d of %d checks passed. Expand a check below to see what was found.', $passed, count($this->results));
+    }
+
+    private function plural(int $count, string $word): string
+    {
+        return sprintf('%d %s', $count, $count === 1 ? $word : $word . 's');
     }
 
     private function normalizeData($data): array
@@ -185,10 +219,5 @@ class Dashboard
     private function runUrl(string $check): string
     {
         return '?run=' . urlencode($check);
-    }
-
-    private function animationDelay(int $index): string
-    {
-        return (min($index, 20) * 0.03) . 's';
     }
 }
