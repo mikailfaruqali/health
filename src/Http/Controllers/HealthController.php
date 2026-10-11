@@ -4,6 +4,7 @@ namespace Snawbar\Health\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Snawbar\Health\View\Dashboard;
 
 class HealthController extends Controller
 {
@@ -13,8 +14,7 @@ class HealthController extends Controller
         $results = $this->runChecks($request, $checks);
 
         return view('health::dashboard', [
-            'checks' => $checks,
-            'results' => $results,
+            'dashboard' => new Dashboard($checks, $results),
         ]);
     }
 
@@ -29,7 +29,7 @@ class HealthController extends Controller
         return collect($checks)
             ->filter(fn ($check) => $this->shouldRunCheck($check, $runCheck))
             ->mapWithKeys(fn ($check) => [$check['class'] => $this->executeCheck($check['class'])])
-            ->toArray();
+            ->all();
     }
 
     private function shouldRunCheck(array $check, string $runCheck): bool
@@ -51,6 +51,6 @@ class HealthController extends Controller
                 'name' => (new $class)->name(),
             ])
             ->values()
-            ->toArray();
+            ->all();
     }
 }

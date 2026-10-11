@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Snawbar\Health;
 
 use Illuminate\Support\ServiceProvider;

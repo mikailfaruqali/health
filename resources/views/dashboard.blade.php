@@ -1,485 +1,652 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101924" />
+    <title>Health</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        :root {
+            --sn-radius: 6px;
+            --sn-primary-rgb: 9, 105, 218;
+            --sn-primary: #0969da;
+            --sn-primary-hover: #0860ca;
+            --sn-success-rgb: 26, 127, 55;
+            --sn-warning-rgb: 154, 103, 0;
+            --sn-danger-rgb: 209, 36, 47;
+            --sn-orange-rgb: 213, 107, 58;
+            --sn-purple-rgb: 153, 97, 214;
+            --sn-slate-rgb: 100, 116, 139;
 
-        * {
-            font-family: 'Inter', sans-serif;
+            --sn-bg: #f5f6fa;
+            --sn-surface: #fff;
+            --sn-surface-soft: #f5f6fa;
+            --sn-border: #dbdfea;
+            --sn-line: #e5e9f2;
+            --sn-heading: #364a63;
+            --sn-text: #526484;
+            --sn-muted: #8094ae;
+            --sn-shadow: 0 10px 26px -18px rgba(15, 23, 42, .45);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --sn-primary-rgb: 88, 166, 255;
+                --sn-primary: #58a6ff;
+                --sn-primary-hover: #79b8ff;
+                --sn-success-rgb: 63, 185, 80;
+                --sn-warning-rgb: 210, 153, 34;
+                --sn-danger-rgb: 248, 81, 73;
+
+                --sn-bg: #101924;
+                --sn-surface: #141c26;
+                --sn-surface-soft: #1b2532;
+                --sn-border: #3d444d;
+                --sn-line: #2a323c;
+                --sn-heading: #fff;
+                --sn-text: #b6c6e3;
+                --sn-muted: #8094ae;
+                --sn-shadow: 0 10px 26px -14px rgba(0, 0, 0, .8);
+            }
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
         }
 
         html,
         body {
-            height: 100%;
+            margin: 0;
+            min-height: 100%;
         }
 
         body {
-            background: #f8fafc;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
+            background: var(--sn-bg);
+            color: var(--sn-text);
+            font-family: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .main-content {
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+            color: var(--sn-heading);
+        }
+
+        /* Header — mirrors the suite's flat "dnav" bar */
+        .hd-nav {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: var(--sn-surface);
+            border-bottom: 1px solid var(--sn-line);
+        }
+
+        .hd-nav__inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            height: 56px;
+            padding: 0 16px;
+        }
+
+        .hd-nav__start,
+        .hd-nav__end {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .hd-nav__heading {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--sn-heading);
+            white-space: nowrap;
+        }
+
+        .hd-nav__sub {
+            color: var(--sn-muted);
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 36px;
+            padding: 0 14px;
+            border: 1px solid transparent;
+            border-radius: var(--sn-radius);
+            font: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: background .15s ease, border-color .15s ease, color .15s ease;
+        }
+
+        .btn-primary {
+            background: var(--sn-primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--sn-primary-hover);
+        }
+
+        .btn-light {
+            background: var(--sn-surface-soft);
+            border-color: var(--sn-line);
+            color: var(--sn-text);
+        }
+
+        .btn-light:hover {
+            color: var(--sn-heading);
+            border-color: var(--sn-border);
+        }
+
+        .btn-icon {
+            width: 36px;
+            padding: 0;
+        }
+
+        .btn-soft {
+            background: rgba(var(--sn-primary-rgb), .1);
+            color: var(--sn-primary);
+        }
+
+        .btn-soft:hover {
+            background: rgba(var(--sn-primary-rgb), .18);
+        }
+
+        /* Layout */
+        .hd-content {
             flex: 1;
-            padding-bottom: 60px;
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px 16px 32px;
         }
 
-        /* Modern card design */
+        .hd-list-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .hd-list-head__title {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        /* Summary chips */
+        .hd-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .hd-stat {
+            --tone: var(--sn-slate-rgb);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 32px;
+            padding: 0 12px;
+            border: 1px solid var(--sn-line);
+            border-radius: var(--sn-radius);
+            background: var(--sn-surface);
+            color: var(--sn-muted);
+            font-size: 13px;
+        }
+
+        .hd-stat strong {
+            color: rgb(var(--tone));
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .hd-stat.is-success {
+            --tone: var(--sn-success-rgb);
+        }
+
+        .hd-stat.is-warning {
+            --tone: var(--sn-warning-rgb);
+        }
+
+        .hd-stat.is-error {
+            --tone: var(--sn-danger-rgb);
+        }
+
+        .hd-stat.is-total strong {
+            color: var(--sn-heading);
+        }
+
+        /* Cards */
         .card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--sn-border);
+            border-radius: var(--sn-radius);
+            background: var(--sn-surface);
+            transition: border-color .15s ease, box-shadow .15s ease;
         }
 
-        .card:hover {
-            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
+        .hd-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
         }
 
-        /* Status badges */
-        .badge-success {
-            background: #dcfce7;
-            color: #166534;
+        .hd-check {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
         }
 
-        .badge-warning {
-            background: #fed7aa;
-            color: #9a3412;
+        .hd-check:hover {
+            border-color: color-mix(in srgb, var(--sn-primary) 40%, var(--sn-border));
+            box-shadow: var(--sn-shadow);
         }
 
-        .badge-error {
-            background: #fee2e2;
-            color: #991b1b;
+        .hd-check__title {
+            flex: 1;
+            min-width: 0;
+            color: var(--sn-heading);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.4;
         }
 
-        /* Smooth animations */
+        .hd-check__chevron {
+            color: var(--sn-muted);
+            font-size: 13px;
+            transition: color .15s ease, transform .2s ease;
+        }
+
+        .hd-check:hover .hd-check__chevron {
+            color: var(--sn-primary);
+            transform: translateX(3px);
+        }
+
+        /* Tinted icon tile — same as suite's accounting index */
+        .icon-tile {
+            --tone: var(--sn-primary-rgb);
+            display: inline-flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--sn-radius);
+            background: rgba(var(--tone), .12);
+            color: rgb(var(--tone));
+            font-size: 18px;
+        }
+
+        .icon-tile.sm {
+            width: 36px;
+            height: 36px;
+            font-size: 15px;
+        }
+
+        .tone-primary { --tone: var(--sn-primary-rgb); }
+        .tone-success { --tone: var(--sn-success-rgb); }
+        .tone-warning { --tone: var(--sn-warning-rgb); }
+        .tone-error { --tone: var(--sn-danger-rgb); }
+        .tone-orange { --tone: var(--sn-orange-rgb); }
+        .tone-purple { --tone: var(--sn-purple-rgb); }
+        .tone-slate { --tone: var(--sn-slate-rgb); }
+
+        /* Results */
+        .hd-results {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .hd-result__head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--sn-line);
+        }
+
+        .hd-result__title {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .hd-result__name {
+            color: var(--sn-heading);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+        }
+
+        .hd-result__meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 10px;
+            margin-top: 2px;
+            color: var(--sn-muted);
+            font-size: 12px;
+        }
+
+        .hd-result__body {
+            padding: 14px 16px;
+        }
+
+        .badge {
+            --tone: var(--sn-slate-rgb);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 1px 8px;
+            border-radius: var(--sn-radius);
+            background: rgba(var(--tone), .12);
+            color: rgb(var(--tone));
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .alert {
+            --tone: var(--sn-danger-rgb);
+            display: flex;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1px solid rgba(var(--tone), .3);
+            border-radius: var(--sn-radius);
+            background: rgba(var(--tone), .08);
+            color: rgb(var(--tone));
+            overflow-wrap: anywhere;
+        }
+
+        .alert i {
+            margin-top: 4px;
+        }
+
+        .hd-empty {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgb(var(--sn-success-rgb));
+            font-weight: 500;
+        }
+
+        /* Table — suite datatable style */
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--sn-border);
+            border-radius: var(--sn-radius);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px 10px;
+            text-align: start;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--sn-line);
+            white-space: nowrap;
+        }
+
+        th {
+            background: var(--sn-surface-soft);
+            color: var(--sn-heading);
+            font-weight: 500;
+            text-transform: capitalize;
+            border-bottom-color: var(--sn-border);
+        }
+
+        th.col-index,
+        td.col-index {
+            width: 1%;
+            color: var(--sn-muted);
+            text-align: center;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        tbody tr:hover td {
+            background: rgba(var(--sn-primary-rgb), .04);
+        }
+
+        td.is-diff {
+            color: rgb(var(--sn-danger-rgb));
+            font-weight: 600;
+        }
+
+        td .is-null {
+            color: var(--sn-muted);
+        }
+
+        /* Footer */
+        .hd-footer {
+            padding: 14px 16px;
+            border-top: 1px solid var(--sn-line);
+            background: var(--sn-surface);
+            color: var(--sn-muted);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .hd-footer a {
+            color: var(--sn-primary);
+        }
+
+        .hd-footer a:hover {
+            text-decoration: underline;
+        }
+
         .fade-in {
-            animation: fadeIn 0.4s ease-out;
+            animation: fadeIn .3s ease-out both;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
+                transform: translateY(6px);
             }
         }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        @media (prefers-reduced-motion: reduce) {
+            .fade-in {
+                animation: none;
+            }
         }
 
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        /* Action button styles */
-        .btn-primary {
-            background: #6366f1;
-            color: white;
-            transition: all 0.2s;
-        }
-
-        .btn-primary:hover {
-            background: #4f46e5;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #475569;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s;
-        }
-
-        .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-
-        /* Check card styles */
-        .check-card {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .check-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: #e2e8f0;
-            transition: background 0.3s;
-        }
-
-        .check-card:hover::before {
-            background: #6366f1;
-        }
-
-        /* Status indicator dot */
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .status-dot.success {
-            background: #10b981;
-            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
-        }
-
-        .status-dot.warning {
-            background: #f59e0b;
-            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
-        }
-
-        .status-dot.error {
-            background: #ef4444;
-            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
-        }
-
-        /* Fixed footer */
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-top: 1px solid #e2e8f0;
-            z-index: 30;
-        }
-
-        /* Mobile Card View for Tables */
-        @media (max-width: 768px) {
-            .responsive-table {
+        @media (max-width: 576px) {
+            .hd-nav__sub,
+            .btn .btn-label {
                 display: none;
             }
 
-            .mobile-cards {
-                display: block;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .responsive-table {
-                display: table;
+            .btn:has(.btn-label) {
+                width: 36px;
+                padding: 0;
             }
 
-            .mobile-cards {
-                display: none;
+            .hd-grid {
+                grid-template-columns: 1fr;
             }
-        }
 
-        /* Desktop table with horizontal scroll as fallback */
-        .table-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .mobile-card-item {
-            background: #f8fafc;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 8px;
-        }
-
-        .mobile-card-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .mobile-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            color: #64748b;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
-
-        .mobile-value {
-            font-size: 14px;
-            color: #1e293b;
-            font-weight: 500;
+            .hd-result__head {
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="container mx-auto px-4 py-6 lg:py-8 max-w-7xl">
-            <!-- Header -->
-            <div class="card rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 fade-in">
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div>
-                        <div class="flex items-center">
-                            <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-indigo-100 flex items-center justify-center mr-3 sm:mr-4">
-                                <i class="fas fa-heartbeat text-indigo-600 text-lg sm:text-xl lg:text-2xl"></i>
-                            </div>
-                            <div>
-                                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
-                                    Health Dashboard
-                                </h1>
-                                <p class="text-gray-500 text-xs sm:text-sm mt-1">System diagnostics and monitoring</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stats -->
-                    <div class="flex items-center gap-4 sm:gap-6">
-                        <div class="text-center">
-                            <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ count($checks) }}</div>
-                            <div class="text-xs text-gray-500 uppercase tracking-wide">Total</div>
-                        </div>
-                        <div class="h-10 sm:h-12 w-px bg-gray-200"></div>
-                        <div class="text-center">
-                            <div class="text-xl sm:text-2xl font-bold text-green-600">
-                                @if (!empty($results))
-                                    {{ collect($results)->where('status', 'success')->count() }}
-                                @else
-                                    0
-                                @endif
-                            </div>
-                            <div class="text-xs text-gray-500 uppercase tracking-wide">Passed</div>
-                        </div>
-                        <div class="h-10 sm:h-12 w-px bg-gray-200"></div>
-                        <div class="text-center">
-                            <div class="text-xl sm:text-2xl font-bold text-amber-600">
-                                @if (!empty($results))
-                                    {{ collect($results)->where('status', 'warning')->count() }}
-                                @else
-                                    0
-                                @endif
-                            </div>
-                            <div class="text-xs text-gray-500 uppercase tracking-wide">Issues</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Bar -->
-                <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-100">
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <a href="?run=all"
-                            class="btn-primary px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium text-center text-sm sm:text-base">
-                            <i class="fas fa-play-circle mr-2"></i>
-                            Run All Checks
-                        </a>
-                        @if (!empty($results))
-                            <a href="{{ url()->current() }}"
-                                class="btn-secondary px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium text-center text-sm sm:text-base">
-                                <i class="fas fa-arrow-left mr-2"></i>
-                                Back to Checks
-                            </a>
-                        @endif
-                    </div>
-                </div>
+    <header class="hd-nav">
+        <div class="hd-nav__inner">
+            <div class="hd-nav__start">
+                <span class="icon-tile sm tone-primary"><i class="fa-solid fa-heart-pulse"></i></span>
+                <span class="hd-nav__heading">Health</span>
+                <span class="hd-nav__sub">System diagnostics</span>
             </div>
-
-            <!-- Checks Grid or Results -->
-            @if (empty($results))
-                <!-- Available Checks -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-                    @foreach ($checks as $index => $check)
-                        <a href="?run={{ $check['class'] }}" class="check-card card rounded-xl p-4 sm:p-6 fade-in"
-                            style="animation-delay: {{ $index * 0.05 }}s">
-                            <div class="flex items-start justify-between mb-3 sm:mb-4">
-                                <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                                    <i
-                                        class="fas fa-{{ $index % 5 == 0 ? 'database' : ($index % 5 == 1 ? 'shield-alt' : ($index % 5 == 2 ? 'chart-line' : ($index % 5 == 3 ? 'server' : 'cog'))) }} text-gray-600"></i>
-                                </div>
-                                <i class="fas fa-arrow-right text-gray-400 text-sm"></i>
-                            </div>
-                            <h3 class="font-semibold text-gray-900 mb-1 text-sm sm:text-base">{{ $check['name'] }}</h3>
-                            <p class="text-xs text-gray-500">Click to run check</p>
-                        </a>
-                    @endforeach
-                </div>
-            @else
-                <!-- Results -->
-                <div class="space-y-4">
-                    @foreach ($results as $result)
-                        <div class="card rounded-xl overflow-hidden fade-in">
-                            <!-- Result Header - Fully Responsive -->
-                            <div
-                                class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 {{ $result['status'] === 'success' ? 'bg-green-50' : ($result['status'] === 'warning' ? 'bg-amber-50' : 'bg-red-50') }}">
-                                <div class="flex flex-col gap-3">
-                                    <!-- Top Row: Name and Status -->
-                                    <div class="flex items-start justify-between">
-                                        <div class="flex items-center flex-1">
-                                            <span class="status-dot {{ $result['status'] }} mr-3 flex-shrink-0"></span>
-                                            <h3 class="font-semibold text-gray-900 text-sm sm:text-base break-words">
-                                                {{ $result['name'] }}</h3>
-                                        </div>
-                                        <a href="?run={{ array_search($result, $results) }}"
-                                            class="text-indigo-600 hover:text-indigo-700 text-xs sm:text-sm font-medium flex-shrink-0 ml-2">
-                                            <i class="fas fa-sync-alt mr-1"></i>
-                                            <span class="hidden sm:inline">Re-run</span>
-                                            <span class="sm:hidden">Retry</span>
-                                        </a>
-                                    </div>
-
-                                    <!-- Bottom Row: Badges -->
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <span
-                                            class="text-xs px-2 py-1 rounded-full {{ $result['status'] === 'success' ? 'badge-success' : ($result['status'] === 'warning' ? 'badge-warning' : 'badge-error') }}">
-                                            @if ($result['status'] === 'success')
-                                                <i class="fas fa-check mr-1"></i>Passed
-                                            @elseif($result['status'] === 'warning')
-                                                <i class="fas fa-exclamation-triangle mr-1"></i>{{ $result['count'] }}
-                                                {{ $result['count'] == 1 ? 'Issue' : 'Issues' }}
-                                            @else
-                                                <i class="fas fa-times mr-1"></i>Error
-                                            @endif
-                                        </span>
-                                        <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">
-                                            <i class="fas fa-clock mr-1"></i>{{ $result['execution_time'] }}ms
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Result Body -->
-                            <div class="p-4 sm:p-6">
-                                @if ($result['status'] === 'error')
-                                    <div class="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
-                                        <div class="flex">
-                                            <i
-                                                class="fas fa-exclamation-circle text-red-500 mr-3 mt-0.5 flex-shrink-0"></i>
-                                            <p class="text-red-700 text-xs sm:text-sm break-words">
-                                                {{ $result['message'] }}</p>
-                                        </div>
-                                    </div>
-                                @elseif(empty($result['data']) || (is_countable($result['data']) && count($result['data']) === 0))
-                                    <div class="flex items-center text-green-600">
-                                        <i class="fas fa-check-circle mr-3 text-lg sm:text-xl flex-shrink-0"></i>
-                                        <p class="font-medium text-sm sm:text-base">All checks passed successfully!</p>
-                                    </div>
-                                @else
-                                    @php
-                                        $data = $result['data'];
-                                        
-                                        if (is_object($data) && method_exists($data, 'toArray')) {
-                                            $data = $data->toArray();
-                                        }
-
-                                        $firstItem = !empty($data) ? reset($data) : null;
-                                        $headers = $firstItem ? array_keys((array) $firstItem) : [];
-                                    @endphp
-
-                                    @if (!empty($headers))
-                                        <!-- Desktop Table View -->
-                                        <div class="table-container hidden md:block">
-                                            <table class="responsive-table w-full text-sm">
-                                                <thead>
-                                                    <tr class="border-b border-gray-200">
-                                                        @foreach ($headers as $header)
-                                                            <th
-                                                                class="text-left py-3 px-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                                {{ str_replace('_', ' ', $header) }}
-                                                            </th>
-                                                        @endforeach
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="divide-y divide-gray-100">
-                                                    @foreach ($data as $row)
-                                                        <tr class="hover:bg-gray-50 transition">
-                                                            @foreach ((array) $row as $key => $value)
-                                                                <td
-                                                                    class="py-3 px-3 {{ str_contains($key, 'difference') && $value != 0 ? 'text-red-600 font-semibold' : 'text-gray-700' }}">
-                                                                    {{ $value }}
-                                                                </td>
-                                                            @endforeach
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                        <!-- Mobile Card View -->
-                                        <div class="mobile-cards md:hidden">
-                                            <div class="space-y-3">
-                                                @foreach ($data as $index => $row)
-                                                    <div class="mobile-card-item">
-                                                        <div class="flex items-center justify-between mb-2">
-                                                            <span class="text-xs font-semibold text-gray-700">Item
-                                                                #{{ $loop->iteration }}</span>
-                                                        </div>
-                                                        <div class="grid grid-cols-1 gap-2">
-                                                            @foreach ((array) $row as $key => $value)
-                                                                <div class="flex flex-col">
-                                                                    <div class="mobile-label">
-                                                                        {{ str_replace('_', ' ', $key) }}</div>
-                                                                    <div
-                                                                        class="mobile-value {{ str_contains($key, 'difference') && $value != 0 ? 'text-red-600 font-semibold' : '' }}">
-                                                                        {{ $value ?: '-' }}
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @else
-                                        <div class="text-gray-500">No data to display</div>
-                                    @endif
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-    </div>
-
-    <!-- Fixed Footer - Fully Responsive -->
-    <footer class="footer">
-        <div class="px-4 py-3">
-            <div class="max-w-7xl mx-auto">
-                <div
-                    class="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-2 text-center sm:text-left">
-                    <p class="text-xs sm:text-sm text-gray-600">
-                        <span class="hidden sm:inline">Health Dashboard</span>
-                        <span class="sm:hidden">Dashboard</span>
-                        &copy; {{ date('Y') }}
-                        <span class="hidden sm:inline">•</span>
-                        <span class="sm:hidden">-</span>
-                        Made with <i class="fas fa-heart text-red-500 text-xs"></i> by Snawbar
-                    </p>
-                    <a href="https://snawbar.com" target="_blank"
-                        class="text-xs sm:text-sm text-indigo-600 hover:text-indigo-700 font-medium inline-flex items-center">
-                        snawbar.com <i class="fas fa-external-link-alt text-xs ml-1"></i>
+            <div class="hd-nav__end">
+                @if ($dashboard->hasResults())
+                    <a href="{{ $dashboard->backUrl() }}" class="btn btn-light" title="Back to checks">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span class="btn-label">Back</span>
                     </a>
-                </div>
+                @endif
+                <a href="{{ $dashboard->runAllUrl() }}" class="btn btn-primary" title="Run all checks">
+                    <i class="fa-solid fa-play"></i>
+                    <span class="btn-label">Run all</span>
+                </a>
             </div>
         </div>
+    </header>
+
+    <main class="hd-content">
+        <div class="hd-list-head">
+            <h1 class="hd-list-head__title">{{ $dashboard->title() }}</h1>
+
+            <div class="hd-stats">
+                @foreach ($dashboard->stats() as $stat)
+                    <span class="hd-stat is-{{ $stat['tone'] }}"><strong>{{ $stat['value'] }}</strong> {{ $stat['label'] }}</span>
+                @endforeach
+            </div>
+        </div>
+
+        @if ($dashboard->hasResults())
+            <div class="hd-results">
+                @foreach ($dashboard->results() as $result)
+                    <section class="card fade-in" style="animation-delay: {{ $result['delay'] }}">
+                        <div class="hd-result__head">
+                            <span class="icon-tile sm tone-{{ $result['status'] }}"
+                                ><i class="fa-solid fa-{{ $result['icon'] }}"></i
+                            ></span>
+
+                            <div class="hd-result__title">
+                                <h2 class="hd-result__name">{{ $result['name'] }}</h2>
+                                <div class="hd-result__meta">
+                                    <span class="badge tone-{{ $result['status'] }}">{{ $result['label'] }}</span>
+                                    <span><i class="fa-regular fa-clock"></i> {{ $result['time'] }}</span>
+                                </div>
+                            </div>
+
+                            <a href="{{ $result['rerunUrl'] }}" class="btn btn-soft btn-icon" title="Re-run">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </a>
+                        </div>
+
+                        <div class="hd-result__body">
+                            @if ($result['view'] === 'error')
+                                <div class="alert">
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                    <span>{{ $result['message'] }}</span>
+                                </div>
+                            @elseif ($result['view'] === 'passed')
+                                <div class="hd-empty">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>All checks passed successfully</span>
+                                </div>
+                            @elseif ($result['view'] === 'table')
+                                <div class="table-wrap">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th class="col-index">#</th>
+                                                @foreach ($result['headers'] as $header)
+                                                    <th>{{ $header }}</th>
+                                                @endforeach
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($result['rows'] as $row)
+                                                <tr>
+                                                    <td class="col-index">{{ $row['number'] }}</td>
+                                                    @foreach ($row['cells'] as $cell)
+                                                        <td @class(['is-diff' => $cell['isDiff']])>
+                                                            @if ($cell['isNull'])
+                                                                <span class="is-null">—</span>
+                                                            @else
+                                                                {{ $cell['value'] }}
+                                                            @endif
+                                                        </td>
+                                                    @endforeach
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <span class="hd-result__meta">No data to display</span>
+                            @endif
+                        </div>
+                    </section>
+                @endforeach
+            </div>
+        @elseif ($dashboard->hasChecks())
+            <div class="hd-grid">
+                @foreach ($dashboard->checks() as $check)
+                    <a
+                        href="{{ $check['url'] }}"
+                        class="card hd-check fade-in"
+                        style="animation-delay: {{ $check['delay'] }}"
+                    >
+                        <span class="icon-tile tone-{{ $check['tone'] }}">
+                            <i class="fa-solid fa-{{ $check['icon'] }}"></i>
+                        </span>
+                        <span class="hd-check__title">{{ $check['name'] }}</span>
+                        <i class="fa-solid fa-chevron-right hd-check__chevron"></i>
+                    </a>
+                @endforeach
+            </div>
+        @else
+            <div class="card hd-result__body">
+                <span class="hd-result__meta">No checks registered. Add check classes to <code>config/snawbar-health.php</code>.</span>
+            </div>
+        @endif
+    </main>
+
+    <footer class="hd-footer">
+        &copy; {{ $dashboard->year() }} Health &middot;
+        <a href="https://snawbar.com" target="_blank" rel="noopener">Snawbar</a>
     </footer>
 </body>
-
 </html>
