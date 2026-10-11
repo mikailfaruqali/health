@@ -77,7 +77,7 @@ class Dashboard
             $issues > 0 => [
                 'tone' => 'warning',
                 'icon' => 'alert',
-                'title' => $this->plural($issues, 'check') . ' need attention',
+                'title' => $this->plural($issues, 'check') . ($issues === 1 ? ' needs' : ' need') . ' attention',
                 'text' => $this->breakdown($passed),
             ],
             default => [
@@ -164,7 +164,7 @@ class Dashboard
 
     private function breakdown(int $passed): string
     {
-        return sprintf('%d of %d checks passed. Expand a check below to see what was found.', $passed, count($this->results));
+        return sprintf('%d of %s passed. Expand a check below to see what was found.', $passed, $this->plural(count($this->results), 'check'));
     }
 
     private function plural(int $count, string $word): string

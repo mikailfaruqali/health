@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light" />
     <title>Health</title>
+    <link
+        rel="icon"
+        type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='20 20 472 472'%3E%3Crect x='20' y='20' width='472' height='472' rx='42' fill='%23249658'/%3E%3Cg fill='%23fff'%3E%3Crect x='154' y='154' width='92' height='92' rx='10'/%3E%3Crect x='266' y='154' width='92' height='92' rx='10'/%3E%3Crect x='154' y='266' width='92' height='92' rx='10'/%3E%3Crect x='266' y='266' width='92' height='92' rx='10'/%3E%3C/g%3E%3C/svg%3E"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -122,18 +127,9 @@
         }
 
         .brand__mark {
-            display: grid;
-            place-items: center;
+            display: block;
             width: 28px;
             height: 28px;
-            border-radius: 8px;
-            background: var(--ink);
-            color: #fff;
-        }
-
-        .brand__mark .i {
-            width: 15px;
-            height: 15px;
         }
 
         .topbar__actions {
@@ -336,20 +332,31 @@
         /* List */
         .list-head {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             gap: 8px;
             margin: 0 2px 10px;
         }
 
         .list-head__title {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
         }
 
         .list-head__count {
-            color: var(--faint);
-            font-family: var(--mono);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 20px;
+            padding: 0 7px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--surface);
+            color: var(--text-soft);
             font-size: 12px;
+            font-weight: 500;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
         }
 
         .list {
@@ -428,8 +435,12 @@
             display: none;
         }
 
-        details>summary:hover {
+        details:not([open])>summary:hover {
             background: var(--subtle);
+        }
+
+        details[open]>summary:hover .caret {
+            color: var(--text);
         }
 
         .caret {
@@ -443,6 +454,10 @@
 
         .detail {
             padding: 0 16px 16px 54px;
+        }
+
+        .detail--table {
+            padding: 0;
         }
 
         .alert {
@@ -463,8 +478,17 @@
         /* Table */
         .table-wrap {
             overflow-x: auto;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
+            border-top: 1px solid var(--border);
+        }
+
+        th:first-child,
+        td:first-child {
+            padding-left: 16px;
+        }
+
+        th:last-child,
+        td:last-child {
+            padding-right: 16px;
         }
 
         table {
@@ -496,7 +520,7 @@
         }
 
         tbody tr:hover td {
-            background: #fcfcfc;
+            background: var(--bg);
         }
 
         td {
@@ -583,7 +607,7 @@
                 flex-wrap: wrap;
             }
 
-            .detail {
+            .detail:not(.detail--table) {
                 padding-left: 16px;
             }
         }
@@ -592,6 +616,15 @@
 
 <body>
     <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <symbol id="i-app" viewBox="20 20 472 472">
+            <rect x="20" y="20" width="472" height="472" rx="42" fill="#249658" />
+            <g fill="#fff">
+                <rect x="154" y="154" width="92" height="92" rx="10" />
+                <rect x="266" y="154" width="92" height="92" rx="10" />
+                <rect x="154" y="266" width="92" height="92" rx="10" />
+                <rect x="266" y="266" width="92" height="92" rx="10" />
+            </g>
+        </symbol>
         <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></symbol>
         <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
         <symbol id="i-alert" viewBox="0 0 24 24">
@@ -623,9 +656,7 @@
     <header class="topbar">
         <div class="topbar__inner container">
             <a href="{{ $dashboard->backUrl() }}" class="brand">
-                <span class="brand__mark"
-                    ><svg class="i"><use href="#i-pulse" /></svg
-                ></span>
+                <svg class="brand__mark" aria-hidden="true"><use href="#i-app" /></svg>
                 Health
             </a>
 
@@ -691,7 +722,7 @@
                                         <svg class="i caret"><use href="#i-down" /></svg>
                                     </summary>
 
-                                    <div class="detail">
+                                    <div class="detail detail--{{ $result['view'] }}">
                                         @if ($result['view'] === 'error')
                                             <div class="alert">{{ $result['message'] }}</div>
                                         @elseif ($result['view'] === 'table')
